@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<h1>查询</h1>
+<table border="1" style="width:100%;">
+    <tr>
+        <th style="padding:5px;width:5%;"><p> 订单ID </p></th>
+        <th style="padding:5px; width:10%;"><p> 当前状态 </p></th>
+        <th style="padding:5px;width:10%;"><p> 预计到达时间 </p></th>
+    </tr>
+    {% for line in ret %}
+    <tr>
+        <td><p>{{ line.id }}</p></td>
+        <td><p>{{ line.state }}</p></td>
+        <td><p>{{ line.rctime }}</p></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!--<p>To see the difference between static and fixed top navbars, just scroll.</p>-->
+<!--<p>-->
+<!--<a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>-->
+<!--</p>-->
+
+{% endblock %}

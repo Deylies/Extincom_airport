@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="{{url_for('static',filename='img/icon.jpg')}}">
+
+    <title>下单系统</title>
+    <!-- 模板原型：https://v3.bootcss.com/examples/navbar-fixed-top/ -->
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{{url_for('static',filename='css/ie10-viewport-bug-workaround.css')}}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{url_for('static',filename='css/navbar-fixed-top.css')}}" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]>
+    <script src="{{url_for('static',filename='js/ie8-responsive-file-warning.js')}}"></script><![endif]-->
+    <script src="{{url_for('static',filename='js/ie-emulation-modes-warning.js')}}"></script>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{{url_for('static',filename='js/vendor/jquery.min.js')}}"><\/script>')</script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{{url_for('static',filename='js/ie10-viewport-bug-workaround.js')}}"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+
+    <![endif]-->
+</head>
+
+<body>
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{url_for('index')}}">下单系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="{{url_for('flight')}}">下单</a></li>
+                <li><a href="{{url_for('query')}}">订单查询</a></li>
+                <!--<li class="dropdown">-->
+                    <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"-->
+                       <!--aria-expanded="false">选择模型<span class="caret"></span></a>-->
+                    <!--<ul class="dropdown-menu">-->
+                        <!--{% for part in all_models %}-->
+                        <!--<li class="dropdown-header">{{part.head}}</li>-->
+                        <!--{% set outerloop=loop %}-->
+                        <!--{% for model in part.models %}-->
+                        <!--<li><a href="/setmol?model={{model[0]}}&project={{part.head}}">{{model[0]}} | {{model[1]}}</a></li>-->
+                        <!--{% endfor %}-->
+                        <!--<li role="separator" class="divider"></li>-->
+                        <!--{% endfor %}-->
+                    <!--</ul>-->
+                <!--</li>-->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <!--<li><a href="#">#</a></li>-->
+                <!--<li><a href="#">#</a></li>-->
+                <!--<li class="active"><a href="./">#<span class="sr-only">(current)</span></a></li>-->
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- Main component for a primary marketing message or call to action -->
+    <div class="jumbotron">
+    {% if msg %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <strong>提示!</strong> {{ msg }}
+        </div>
+    {% endif %}
+        {% block body %}
+        {% endblock %}
+        <!--<h1>Navbar example</h1>-->
+        <!--<p>This example is a quick exercise to illustrate how the default, static and fixed to top navbar work. It-->
+            <!--includes the responsive CSS and HTML, so it also adapts to your viewport and device.</p>-->
+        <!--<p>To see the difference between static and fixed top navbars, just scroll.</p>-->
+        <!--<p>-->
+            <!--<a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>-->
+        <!--</p>-->
+    </div>
+
+</div> <!-- /container -->
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+
+</body>
+</html>

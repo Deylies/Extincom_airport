@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<h1>登陆</h1>
+<form action="{{url_for('login')}}" method="post">
+    <div class="input-group">
+        <span class="input-group-addon" id="sizing-addtw">用 户</span>
+        <input type="text" class="form-control" placeholder="username" aria-describedby="sizing-addtw"
+               name="username">
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon" id="sizing-addon">密 码</span>
+        <input type="password" class="form-control" placeholder="password" aria-describedby="sizing-addon"
+               name="passwd">
+    </div>
+    <br>
+    <button type="submit" class="btn btn-default" aria-describedby="sizing-addon">提交</button>
+    <a href="{{url_for('regist')}}">注册</a>
+</form>
+<!--<p>To see the difference between static and fixed top navbars, just scroll.</p>-->
+<!--<p>-->
+<!--<a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>-->
+<!--</p>-->
+
+{% endblock %}

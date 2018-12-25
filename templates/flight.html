@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<h1>下单</h1>
+<form action="{{url_for('flight')}}" method="post">
+    <h3>选择订单产品</h3>
+    <table border="1" style="width:100%;">
+        <tr>
+            <th style="padding:5px;width:5%;"><p> ID </p></th>
+            <th style="padding:5px; width:10%;"><p> 名称 </p></th>
+            <th style="padding:5px;width:10%;"><p> 重量 </p></th>
+            <th style="padding:5px;width:10%;"><p> 数量 </p></th>
+            <th style="padding:5px;width:10%;"><p> 下单数量 </p></th>
+        </tr>
+        {% for line in inventory %}
+        {% if line.quantity>0 %}
+        <tr>
+            <td><p>{{ line.id }}</p></td>
+            <td><p>{{ line.product }}</p></td>
+            <td><p>{{ line.mass_g }}</p></td>
+            <td><p>{{ line.quantity }}</p></td>
+            <td><input type="text" class="form-control" value="0" aria-describedby="sizing-addtw"
+                       name="{{line.id}}-{{line.quantity}}-{{ line.mass_g }}"></td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+    <h3>选择目标医院</h3>
+    <table border="1" style="width:100%;">
+        <tr>
+            <th style="padding:5px;width:20%;"><p> ID </p></th>
+            <th style="padding:5px; width:20%;"><p> 名称 </p></th>
+            <th style="padding:5px;width:20%;"><p> 预计时间（秒） </p></th>
+            <th style="padding:5px; width:5%;"><p> 选择 </p></th>
+        </tr>
+        {% for line in hospitals %}
+        <tr>
+            <td><p>{{ line.id }}</p></td>
+            <td><p>{{ line.name }}</p></td>
+            <td><p>{{ line.flight_time_s }}</p></td>
+            <td><input type="radio" name="hospital" value="{{ line.id }}-{{line.flight_time_s}}"></td>
+        </tr>
+        {% endfor %}
+    </table>
+<button type="submit" class="btn btn-default" aria-describedby="sizing-addon">提交</button>
+</form>
+<!--<p>To see the difference between static and fixed top navbars, just scroll.</p>-->
+<!--<p>-->
+<!--<a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button">View navbar docs &raquo;</a>-->
+<!--</p>-->
+
+{% endblock %}
