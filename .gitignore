@@ -1,0 +1,13 @@
+.git/*
+.idea/*
+tmp_*
+__pycache__/*
+build/*
+dist/*
+flask_session/*
+*.zip
+*.txt
+*.spec
+*.lnk
+nohup*
+*.log

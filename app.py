@@ -179,7 +179,7 @@ def flight():
             order = Order()
             order.Flights = ",".join([str(i) for i in flights])
             order.Receive_Time = requests.get("http://localhost:12345/time").json() + int(flight_time_s)
-            order.State = "CONFIRM"
+            order.State = "CONFIRMED"
             order.User_ID = user_id
             sess = db.session()
             sess.add(order)
@@ -229,7 +229,7 @@ def query():
         if task.Receive_Time - now <= 300:  # 5分钟以内
             js['rctime'] = "订单⻢上到达"
         else:
-            js['rctime'] = task.Receive_Time
+            js['rctime'] = task.Receive_Time-now
         ret.append(js)
     msg = request.args.get('msg')
     return render_template("query.html", msg=msg, ret=ret)
