@@ -1,7 +1,7 @@
 # encoding:utf-8
 # __author__:DeyLies,WangYu
 from flask import Flask, request, render_template, url_for, redirect, jsonify
-from flask_login import login_user, login_required, LoginManager, current_user
+from flask_login import login_user, login_required, LoginManager, current_user, logout_user
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import HTTPException, default_exceptions
@@ -156,25 +156,6 @@ def flight():
             print(ret)
             flights.append(flight_ID)
         if len(flights):
-            # for f in flights:
-            #     # 直接确认全部飞机起飞
-            #     ret ={'error': ""}
-            #     new_id = f
-            #     while "error" in ret.keys():
-            #         print(requests.get("http://localhost:12345/flight/%s"%new_id).json())
-            #         print(ret)
-            #         ret = requests.post("http://localhost:12345/flight/%s/confirm"%f).json()
-            #         if ret.get("sucess"):
-            #             break
-            #         else:
-            #             s = requests.get("http://localhost:12345/flight/%s"%new_id).json() # 查询状态
-            #             new_flight = requests.post("http://localhost:12345/flight",
-            #                               json={"hospital": s.get("hospital"),
-            #                                     "products": s.get("products")}).json() # 重新派遣飞机
-            #             print(new_flight)
-            #             new_id = new_flight.get('id')
-            #             ret = requests.post("http://localhost:12345/flight/%s/confirm" % f).json()
-            #             print(ret)
             user_id = current_user.get_id()
             order = Order()
             order.Flights = ",".join([str(i) for i in flights])
@@ -190,11 +171,75 @@ def flight():
             return redirect(url_for("flight", msg="产品数量不能全为0"))
 
 
+@app.route("/rootquery", methods=["GET"])
+@login_required
+def rootquery():
+    sess = db.session()
+    user_id = current_user.get_id()
+    user = sess.query(User).filter(User.User_ID == user_id).first()
+    if not user.User_Name == 'root':
+        logout_user()
+        return redirect(url_for('login', msg="请重新登陆"))
+    tasks = sess.query(Order).all()
+    ret = []
+    hospital_info = requests.get("http://localhost:12345/hospitals").json() # 获取医院信息
+    for task in tasks:
+        js = {"id": task.ID,
+              "state": "",
+              "products": [],
+              "hospital": "",
+              "rctime": 0,
+              "bktime": 0}
+        flights = task.Flights.split(',')
+        new_state = task.State
+        # if len(flights) > 1:
+        # 多飞机逻辑
+        Shipped = 0
+        Delayed = 0
+        Product_Num = 0
+        for f in flights:
+            state = requests.get("http://localhost:12345/flight/%s" % f).json()  # 查询状态
+            print(state)
+            new_state = state.get("state")
+            js['products'] += state.get('products')
+            js['hospital'] = state.get('hospital')
+            cnt = len(state.get('products'))
+            if state.get("state") == "SHIPPED":
+                Shipped += cnt
+            elif state.get("state") == "DELAYED":
+                Delayed += cnt
+            Product_Num += cnt
+        if Shipped or Delayed:
+            new_state = ""
+            if Shipped:
+                new_state += "%s SHIPPED;" % (str(int(Shipped / Product_Num * 100)) + "%")
+            if Delayed:
+                new_state += "%s DELAYED" % (str(int(Delayed / Product_Num * 100)) + "%")
+            task.State = new_state
+            sess.add(task)
+            sess.commit()
+        js['products'] = ",".join(["产品ID:%s,数量:%s"%(i,js['products'].count(i)) for i in set(js['products'])])
+        js['state'] = new_state
+        js['rctime'] = task.Receive_Time
+        for i in hospital_info:
+            if i['id'] == int(js['hospital']):
+                flight_time_s = i['flight_time_s']
+                break
+        js['bktime'] = int(task.Receive_Time) + int(flight_time_s)
+        ret.append(js)
+    msg = request.args.get('msg')
+    return render_template("rootquery.html", msg=msg, ret=ret)
+
+
 @app.route("/query", methods=["GET"])
 @login_required
 def query():
     sess = db.session()
     user_id = current_user.get_id()
+    user = sess.query(User).filter(User.User_ID == user_id).first()
+    if not user:
+        logout_user()
+        return redirect(url_for('login', msg="请重新登陆"))
     tasks = sess.query(Order).filter(Order.User_ID == user_id).all()
     ret = []
     for task in tasks:
@@ -207,29 +252,35 @@ def query():
             # 多飞机逻辑
             Shipped = 0
             Delayed = 0
+            Product_Num = 0
             for f in flights:
                 state = requests.get("http://localhost:12345/flight/%s" % f).json()  # 查询状态
                 print(state)
                 new_state = state.get("state")
+                cnt = len(state.get('products'))
                 if state.get("state") == "SHIPPED":
-                    Shipped += 1
+                    Shipped += cnt
                 elif state.get("state") == "DELAYED":
-                    Delayed += 1
+                    Delayed += cnt
+                Product_Num += cnt
             if Shipped or Delayed:
                 new_state = ""
                 if Shipped:
-                    new_state += "%s SHIPPED;" % (str(int(Shipped / len(flights) * 100)) + "%")
+                    new_state += "%s SHIPPED;" % (str(int(Shipped / Product_Num * 100)) + "%")
                 if Delayed:
-                    new_state += "%s DELAYED" % (str(int(Delayed / len(flights) * 100)) + "%")
+                    new_state += "%s DELAYED" % (str(int(Delayed / Product_Num * 100)) + "%")
             task.State = new_state
             sess.add(task)
             sess.commit()
         js['state'] = new_state
         now = requests.get("http://localhost:12345/time").json()
         if task.Receive_Time - now <= 300:  # 5分钟以内
-            js['rctime'] = "订单⻢上到达"
+            if js['state'] == "DELIVERED":
+                js['rctime'] = "DELIVERED"
+            else:
+                js['rctime'] = "订单⻢上到达"
         else:
-            js['rctime'] = task.Receive_Time-now
+            js['rctime'] = task.Receive_Time - now
         ret.append(js)
     msg = request.args.get('msg')
     return render_template("query.html", msg=msg, ret=ret)
@@ -251,7 +302,10 @@ def login():
                 user = user[0]
                 if passwd == user.User_Passwd:  # 检查密码是否正确
                     login_user(user, remember=True)
-                    return redirect(url_for("flight", msg="登陆成功"))
+                    if username=="root": #管理员登陆
+                        return redirect(url_for("rootquery", msg="登陆成功"))
+                    else:
+                        return redirect(url_for("flight", msg="登陆成功"))
             else:
                 return redirect(url_for("login", msg="用户不存在"))
         else:
@@ -303,7 +357,14 @@ def main():
 
     with app.app_context():
         db.create_all()
-        db.session.commit()
+        sess = db.session()
+        sess.commit()
+        root = User()
+        root.User_Name = "root"
+        root.User_Passwd = "123"
+        sess.add(root)
+        sess.commit()
+        sess.close()
 
     app.run(host=args.addr, port=args.port, debug=True)
 
