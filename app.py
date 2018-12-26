@@ -220,7 +220,7 @@ def query():
                 if Shipped:
                     new_state += "%s SHIPPED;" % (str(int(Shipped / len(flights) * 100)) + "%")
                 if Delayed:
-                    new_state += "%s SHIPPED" % (str(int(Delayed / len(flights) * 100)) + "%")
+                    new_state += "%s DELAYED" % (str(int(Delayed / len(flights) * 100)) + "%")
             task.State = new_state
             sess.add(task)
             sess.commit()
