@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .git/*
 .idea/*
 tmp_*
@@ -10,4 +11,7 @@ flask_session/*
 *.spec
 *.lnk
 nohup*
+=======
+flask_session/*
+>>>>>>> 1da4033e27c72988f044d2b031dc6cb0f28198e2
 *.log
