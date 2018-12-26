@@ -296,7 +296,7 @@ def regist():
 def main():
     parser = argparse.ArgumentParser(description="Run a simulated nest environment")
     parser.add_argument('--addr', default='0.0.0.0', help="Which address to bind to")
-    parser.add_argument('--port', default=6669, help="Which port to run the server on")
+    parser.add_argument('--port', default=6662, help="Which port to run the server on")
     parser.add_argument('--debug', default=True, help="Which port to run the server on")
 
     args = parser.parse_args()
